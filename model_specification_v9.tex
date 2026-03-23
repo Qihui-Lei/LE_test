@@ -1,0 +1,435 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{natbib}
+\usepackage{caption}
+
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\LE}{\mathrm{LE}}
+\newcommand{\RE}{\mathrm{RE}}
+
+\title{\textbf{Model Specification v9} \\ Female Lifetime Earnings Inequality: \\ Job Ladders, Amenity Choice, and Endogenous Fertility}
+\author{}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+%===============================================================================
+\section{Environment}
+%===============================================================================
+
+Time is discrete, annual. There are two phases:
+\begin{itemize}[nosep]
+  \item \textbf{Early Phase} (ages 18--24, 7 periods): simplified forward simulation generating initial conditions.
+  \item \textbf{Main Phase} (ages 25--55, 31 periods): full dynamic programming problem.
+\end{itemize}
+Lifetime earnings are defined as $\LE_i = \sum_{t=0}^{T} w_{it}$, where $w_{it}$ denotes observed annual earnings from age 25 ($t=0$) to 55 ($t=T=30$).
+
+%===============================================================================
+\section{Early Phase (Ages 18--24): Initial Condition Generator}
+%===============================================================================
+
+At age 18, a woman draws permanent ability type $\alpha \sim \mathcal{N}(\mu_\alpha, \sigma_\alpha^2)$. For each year $t_e = 18, 19, \ldots, 24$:
+
+\begin{itemize}[nosep]
+  \item \textbf{Human capital:} If no birth disruption, $h' = h + \psi_{\text{early}}(\alpha)$; if birth, $h' = h$ (frozen). Initial $h_{18} = h_{\text{base}}$.
+  \item \textbf{Exogenous fertility:} A birth occurs with probability $\lambda_{\text{exo}}(\alpha) = \sigma(\ell_0 + \ell_\alpha \cdot \alpha)$, decreasing in $\alpha$. No endogenous fertility choice before age 25.
+  \item \textbf{Birth disruption:} Freezes $h$ for one period; sets youngest child age $k = 0$.
+\end{itemize}
+
+\noindent\textbf{Output at age 25:} For each type $\alpha$, the early phase produces a distribution over $(h_{25}, \text{employment status}, k_{25})$. Women with pre-25 births enter the main phase with lower $h$, $k > 0$, and shifted amenity preferences from the first period.
+
+%===============================================================================
+\section{Main Phase (Ages 25--55)}
+%===============================================================================
+
+\subsection{Firms}
+
+Firms are characterized by productivity $p \in \{p_1, \ldots, p_J\}$, $J \approx 15$, with offer distribution $F(p)$. Each firm offers a \textbf{menu} of amenity levels $a \in \{L, M, H\}$; the worker chooses $a$ each period.
+
+\medskip\noindent\textbf{Wages:}
+\begin{equation}\label{eq:wage}
+  w(p, a, h) = p \cdot h - c(a), \qquad c(L) = 0 < c(M) < c(H).
+\end{equation}
+
+\noindent\textbf{Separation rate:} Decreasing in $p$:
+\begin{equation}\label{eq:delta}
+  \delta(p) = \delta_0 + \delta_1 \cdot \frac{p_{\max} - p}{p_{\max} - p_{\min}}.
+\end{equation}
+
+\subsection{Birth-Event Probabilities}\label{sec:birth_probs}
+
+Upon a birth event, an employed woman at firm $p$ faces one of three outcomes:
+
+\begin{enumerate}[nosep]
+  \item \textbf{Paid leave} with probability $\pi_{\text{paid}}(p)$: one period at $\theta \cdot w(p, a^*, h)$; $h$ frozen; returns to same $p$ next period with $k = 0\text{--}2$.
+  \item \textbf{Unpaid leave} with probability $\pi_{\text{unpaid}}(p)$: one period at $b$ (unemployment flow value); $h$ frozen; returns to same $p$ next period with $k = 0\text{--}2$.
+  \item \textbf{Separation} with probability $1 - \pi_{\text{paid}}(p) - \pi_{\text{unpaid}}(p)$: enters unemployment with depreciated $h$ and $k = 0\text{--}2$.
+\end{enumerate}
+
+\noindent Both $\pi_{\text{paid}}(p)$ and $\pi_{\text{unpaid}}(p)$ are increasing in $p$:
+\begin{align}
+  \pi_{\text{paid}}(p) &= \pi^{\text{pd}}_0 + \pi^{\text{pd}}_1 \cdot \frac{p - p_{\min}}{p_{\max} - p_{\min}}, \label{eq:pi_paid}\\[4pt]
+  \pi_{\text{unpaid}}(p) &= \pi^{\text{up}}_0 + \pi^{\text{up}}_1 \cdot \frac{p - p_{\min}}{p_{\max} - p_{\min}}, \label{eq:pi_unpaid}
+\end{align}
+with $\pi_{\text{paid}}(p) + \pi_{\text{unpaid}}(p) \leq 1$ for all $p$. The institutional mapping is: paid leave corresponds to firms with employer-provided parental leave; unpaid leave corresponds to FMLA-eligible firms without paid leave; separation corresponds to firms below FMLA thresholds or where the worker is ineligible.
+
+\medskip\noindent\textbf{Replacement rate:} $\theta \in (0,1)$ is the fraction of the normal wage received during paid leave. Calibrated externally to data on employer-provided leave generosity.
+
+\subsection{Amenity Choice (Static, Each Period)}
+
+Each period, an employed worker at $(h, p, k)$ chooses:
+\begin{equation}\label{eq:amenity_choice}
+  a^*(p, h, k) = \arg\max_{a \in \{L,M,H\}} \big\{ p \cdot h - c(a) + v(a, k) \big\}.
+\end{equation}
+This is a comparison of 3 values, computed on the fly. Amenity $a$ is \textbf{not} a state variable.
+
+\medskip\noindent\textbf{Amenity preferences:}
+\begin{equation}\label{eq:amenity_pref}
+  v(a, k) = v_0(a) + v_1(a) \cdot g(k),
+\end{equation}
+where $v_0(L) = 0$ (normalization), $v_0(H) \geq v_0(M) \geq 0$ (baseline amenity value for all workers), $v_1(L) = 0$, $v_1(H) \geq v_1(M) \geq 0$ (motherhood-induced shift), and
+\[
+  g(\varnothing) = 0, \quad g(0\text{--}2) = 1, \quad g(3\text{--}5) = g_{\text{mid}}, \quad g(6+) = g_{\text{low}} \approx 0.
+\]
+
+\noindent A childless worker chooses $a$ to maximize $p \cdot h - c(a) + v_0(a)$; typically $a = L$ (highest wage). A mother with an infant may switch to $a = H$, accepting wage cut $c(H)$ for amenity value $v_1(H)$. As the child ages and $g(k) \to 0$, she switches back.
+
+\subsection{Workers}
+
+\textbf{Type:} $\alpha$ (drawn at 18, permanent). \\[4pt]
+\textbf{Employed state variables:} $(h, p, k, t)$; \textbf{Unemployed:} $(h, k, t)$.
+\begin{itemize}[nosep]
+  \item $h$: human capital ($\approx 15$ grid points)
+  \item $p$: firm productivity ($\approx 15$ grid points)
+  \item $k \in \{\varnothing,\ 0\text{--}2,\ 3\text{--}5,\ 6+\}$: age of youngest child (4 values)
+  \item $t$: age 25--55 (31 periods)
+\end{itemize}
+
+\subsection{Human Capital Accumulation}
+
+\begin{itemize}[nosep]
+  \item \textbf{Employed:} $h' = h + \psi(\alpha, t)$, where $\psi(\alpha, t) = \psi_0 + \psi_\alpha \cdot \alpha + \psi_{\text{age}} \cdot (t - t_0)$. Decreasing in age, increasing in $\alpha$.
+  \item \textbf{Unemployed:} $h' = h - d$ with probability $\psi_u$; else $h' = h$.
+  \item \textbf{On maternity leave (paid or unpaid):} $h' = h$ (frozen).
+\end{itemize}
+
+\subsection{Search}
+
+Unemployed workers meet firms at rate $\lambda_0$; employed workers at rate $\lambda_1$. Upon meeting, the worker draws $p' \sim F(p)$.
+
+\medskip\noindent\textbf{Acceptance rule.} A worker at firm $p$ accepts offer $p'$ if:
+\[
+  \max_{a} \big\{ p' \cdot h - c(a) + v(a,k) \big\} > \max_{a} \big\{ p \cdot h - c(a) + v(a,k) \big\}.
+\]
+Since $c(a)$ and $v(a,k)$ do not depend on $p$, the amenity terms cancel:
+\begin{equation}\label{eq:acceptance}
+  \text{Accept iff } p' > p.
+\end{equation}
+Workers climb a one-dimensional $p$-ladder. Amenity adjusts optimally at any $p$.
+
+\subsection{Fertility}
+
+\textbf{Combined exogenous and endogenous.} Each period, if eligible ($k = \varnothing$ or $k \in \{3\text{--}5, 6+\}$; and age $\leq 40$):
+\begin{enumerate}[nosep]
+  \item \textbf{Exogenous shock:} With probability $\lambda_{\text{exo}}(\alpha) = \sigma(\ell_0 + \ell_\alpha \cdot \alpha)$, a birth occurs regardless of the woman's choice.
+  \item \textbf{If no exogenous shock:} The woman chooses \textsc{Try} or \textsc{Wait}. If \textsc{Try}, conception succeeds with probability $s(t)$, externally calibrated to biological fertility data.
+\end{enumerate}
+Each birth delivers a one-time utility bonus $B_{\text{kid}}$.
+
+%===============================================================================
+\section{Value Functions}
+%===============================================================================
+
+Define the optimized flow utility at firm $p$:
+\begin{equation}\label{eq:Vstar}
+  V^*(p, h, k) \equiv \max_{a \in \{L,M,H\}} \big\{ p \cdot h - c(a) + v(a, k) \big\},
+\end{equation}
+and let $a^*(p, h, k)$ denote the optimal amenity choice.
+
+\subsection{Continuation Value}
+
+The continuation value for an employed worker at $(h, p, k)$, conditional on no birth event, is:
+\begin{equation}\label{eq:Omega}
+  \Omega_{t+1}(h, p, k) = \delta(p) \cdot U_{t+1}(h, k)
+  + \big(1 - \delta(p)\big) \bigg[ \lambda_1 \int_{p}^{p_{\max}} W_{t+1}(h, p', k)\, dF(p') + \big(1 - \lambda_1(1 - F(p))\big) \cdot W_{t+1}(h, p, k) \bigg],
+\end{equation}
+where the integral exploits the acceptance rule $p' > p$.
+
+\subsection{Employed, Outside Fertile Window}
+
+For $t > t_{\text{fertile}}$ or fertility-ineligible $k$:
+\begin{equation}\label{eq:W_nonfertile}
+  W_t(h, p, k) = V^*(p, h, k) + \beta \cdot \E_{h'|E}\big[\Omega_{t+1}(h', p, k')\big],
+\end{equation}
+where $k'$ denotes the aged-up youngest child state.
+
+\subsection{Employed, Fertile and Eligible}
+
+\begin{equation}\label{eq:W_fertile}
+  W_t(h, p, k) = V^*(p, h, k) + \beta \cdot \E_{h'|E}\Big[
+    \lambda_{\text{exo}}(\alpha) \cdot \textsc{Birth}(h', p)
+    + \big(1 - \lambda_{\text{exo}}(\alpha)\big) \cdot \max\big\{\textsc{Try}(h', p, k'),\; \textsc{Wait}(h', p, k')\big\}
+  \Big],
+\end{equation}
+where:
+\begin{align}
+  \textsc{Birth}(h, p) &= \pi_{\text{paid}}(p) \cdot M^{\text{pd}}_{t+1}(h, p) + \pi_{\text{unpaid}}(p) \cdot M^{\text{up}}_{t+1}(h, p) \notag\\
+  &\quad + \big(1 - \pi_{\text{paid}}(p) - \pi_{\text{unpaid}}(p)\big) \cdot U_{t+1}(h_{\text{dep}}, k{=}0\text{--}2) + B_{\text{kid}}, \label{eq:BIRTH}\\[6pt]
+  \textsc{Try}(h, p, k') &= s(t) \cdot \textsc{Birth}(h, p) + \big(1 - s(t)\big) \cdot \Omega_{t+1}(h, p, k'), \label{eq:TRY}\\[4pt]
+  \textsc{Wait}(h, p, k') &= \Omega_{t+1}(h, p, k'). \label{eq:WAIT}
+\end{align}
+The woman chooses \textsc{Try} if and only if:
+\begin{equation}\label{eq:try_condition}
+  s(t) \cdot \big[\textsc{Birth}(h, p) - \Omega_{t+1}(h, p, k')\big] \geq 0.
+\end{equation}
+
+\subsection{Maternity Leave Values}
+
+\textbf{Paid leave.} The woman receives fraction $\theta$ of her normal wage plus amenity value during one period of leave, with $h$ frozen and job protected:
+\begin{equation}\label{eq:M_paid}
+  M^{\text{pd}}_{t+1}(h, p) = \theta \cdot w\big(p,\, a^*(p, h, 0\text{--}2),\, h\big) + v\big(a^*(p, h, 0\text{--}2),\, 0\text{--}2\big) + \beta \cdot W_{t+2}(h, p, k{=}0\text{--}2).
+\end{equation}
+
+\textbf{Unpaid leave.} The woman receives unemployment flow value $b$ plus amenity value during one period, with $h$ frozen and job protected:
+\begin{equation}\label{eq:M_unpaid}
+  M^{\text{up}}_{t+1}(h, p) = b + v\big(a^*(p, h, 0\text{--}2),\, 0\text{--}2\big) + \beta \cdot W_{t+2}(h, p, k{=}0\text{--}2).
+\end{equation}
+
+\noindent In both cases, the woman returns to the same firm $p$ next period with $k = 0\text{--}2$.
+
+\subsection{Unemployed, Outside Fertile Window}
+
+\begin{equation}\label{eq:U_nonfertile}
+  U_t(h, k) = b + v_{\text{home}}(k) + \beta \cdot \E_{h'|U}\bigg[
+    \lambda_0 \int_{p_{\min}}^{p_{\max}} \max\big\{W_{t+1}(h', p', k'),\; U_{t+1}(h', k')\big\}\, dF(p')
+    + (1 - \lambda_0) \cdot U_{t+1}(h', k')
+  \bigg].
+\end{equation}
+
+\subsection{Unemployed, Fertile and Eligible}
+
+\begin{equation}\label{eq:U_fertile}
+  U_t(h, k) = b + v_{\text{home}}(k) + \beta \cdot \E_{h'|U}\Big[
+    \lambda_{\text{exo}}(\alpha) \cdot \big[U_{t+1}(h'_{\text{dep}}, k{=}0\text{--}2) + B_{\text{kid}}\big]
+    + \big(1 - \lambda_{\text{exo}}(\alpha)\big) \cdot \max\big\{\textsc{Try}_U(h', k'),\; \textsc{Wait}_U(h', k')\big\}
+  \Big],
+\end{equation}
+where:
+\begin{align}
+  \textsc{Try}_U(h, k') &= s(t) \cdot \big[U_{t+1}(h_{\text{dep}}, k{=}0\text{--}2) + B_{\text{kid}}\big]
+    + \big(1 - s(t)\big) \cdot \textsc{Search}(h, k'), \label{eq:TRY_U}\\[4pt]
+  \textsc{Wait}_U(h, k') &= \textsc{Search}(h, k'), \label{eq:WAIT_U}\\[4pt]
+  \textsc{Search}(h, k) &= \lambda_0 \int_{p_{\min}}^{p_{\max}} \max\big\{W_{t+1}(h, p', k),\; U_{t+1}(h, k)\big\}\, dF(p')
+    + (1 - \lambda_0) \cdot U_{t+1}(h, k). \label{eq:SEARCH}
+\end{align}
+
+%===============================================================================
+\section{State Space}
+%===============================================================================
+
+\begin{table}[h]\centering
+\caption{State space dimensions}
+\begin{tabular}{llr}
+\toprule
+Variable & Values & Grid size \\
+\midrule
+$h$ & Human capital & 15 \\
+$p$ & Firm productivity & 15 \\
+$k$ & Youngest child age $\{\varnothing, 0\text{--}2, 3\text{--}5, 6+\}$ & 4 \\
+$t$ & Age 25--55 & 31 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent Employed states per age: $15 \times 15 \times 4 = 900$. Unemployed states per age: $15 \times 4 = 60$. Total per age: 960. Grand total: $\approx 29{,}760$. Solved by backward induction. Amenity $a$ is computed on the fly (3-way comparison), not stored as a state variable.
+
+%===============================================================================
+\section{Simulation: Within-Year Timing Draw}\label{sec:timing}
+%===============================================================================
+
+The model operates at annual frequency, but the SSA data record annual total W-2 earnings. A birth can occur at any point within the year, generating a continuous range of annual earnings outcomes. To bridge the model's annual decisions and the data's annual accounting, we introduce a within-year timing draw in the simulation:
+
+\medskip\noindent Conditional on a birth event in year $t$, draw $\tau \sim \text{Uniform}[0, 1]$, representing the fraction of the year worked \emph{before} the birth. Annual observed earnings for the birth year are:
+
+\begin{itemize}[nosep]
+  \item \textbf{Paid leave:} $w_t^{\text{obs}} = \tau \cdot w(p, a^*_{\text{pre}}, h) + (1 - \tau) \cdot \theta \cdot w(p, a^*_{\text{post}}, h)$,
+
+    where $a^*_{\text{pre}}$ is the amenity choice before birth (typically $L$) and $a^*_{\text{post}}$ is the choice upon return (potentially $H$).
+  \item \textbf{Unpaid leave:} $w_t^{\text{obs}} = \tau \cdot w(p, a^*_{\text{pre}}, h)$.
+  \item \textbf{Separation:} $w_t^{\text{obs}} = \tau \cdot w(p, a^*_{\text{pre}}, h)$.
+\end{itemize}
+
+\noindent The timing draw $\tau$ affects only \emph{observed earnings} used for moment computation, not the value functions. The dynamic programming continues to operate at annual frequency with expected payoffs.
+
+\medskip\noindent\textbf{Rationale.} The three-outcome leave structure combined with the continuous timing draw generates a continuous left tail in the distribution of annual earnings changes, matching the pattern observed in the SSA data (GKOS moments). Without the timing draw, the model produces discrete mass points at specific earnings ratios. With it, the same woman at the same firm generates different annual earnings depending on whether she gives birth in January versus November. This is the correct measurement bridge between model and data.
+
+%===============================================================================
+\section{Observables and Model--Data Mapping}\label{sec:observables}
+%===============================================================================
+
+\textbf{Observed wages:} $w^{\text{obs}} = p \cdot h - c(a^*(p, h, k))$, where $a^*$ is endogenous. Two women at the same $(p, h)$ but different $k$ have different observed wages if they choose different amenity levels. This generates a ``motherhood wage penalty'' driven entirely by amenity sorting.
+
+\medskip\noindent\textbf{Decomposition of earnings drop at birth:}
+\begin{itemize}[nosep]
+  \item \emph{Leave component:} Within-year timing $\tau$ plus wage replacement ($\theta$ for paid leave, 0 for unpaid).
+  \item \emph{Amenity-sorting component:} Switching from $a = L$ to $a = H$ costs $c(H)$ in wages.
+  \item \emph{Separation component:} Loss of firm match; re-entry at lower $p$.
+  \item \emph{HC component:} Depreciation of $h$ during unemployment.
+\end{itemize}
+
+\medskip\noindent\textbf{Lifetime earnings:} $\LE_i = \sum_{t=0}^{T} w^{\text{obs}}_{it} = \sum_{t=0}^{T} [p_{it} \cdot h_{it} - c(a^*_{it})]$, where birth-year earnings use the timing-draw formula from Section~\ref{sec:timing}. The amenity cost $c(a^*)$ directly reduces LE for mothers who choose high amenity.
+
+\bigskip
+\noindent\textbf{Implementation note: replicating GKOS sample selection and moment construction.}
+\begin{enumerate}[nosep]
+  \item \textbf{LE sample selection.} Following GKOS/KOS, construct a balanced panel of simulated agents from ages 25--55. Require annual earnings above $Y_{\min} \approx \$1{,}885$ (2010 dollars) for at least 15 of 31 years. Compute $\LE_i$ as the sum of annual earnings over ages 25--55. Rank into LE percentiles. Report the fraction of simulated agents excluded by this filter.
+  \item \textbf{RE construction.} For each simulated agent and year $t$: (a) compute average earnings in levels over years $t{-}5$ to $t{-}1$, setting below-$Y_{\min}$ observations to $Y_{\min}$; (b) estimate age dummies from the simulated cross-section; (c) normalize by average age-specific population earnings; (d) rank into RE percentiles within each age group.
+  \item \textbf{Arc percent change.} Compute $\Delta^{\text{arc}}_{i,t,1} = 2(Y_{t+1} - Y_t)/(Y_{t+1} + Y_t)$. If both $Y_t = 0$ and $Y_{t+1} = 0$, exclude the observation. Aggregate into 3 age groups (25--34, 35--44, 45--54) and 6 RE groups, then compute P10 and Kelley skewness within each cell.
+  \item \textbf{Base sample for RE moments.} Require the agent to be admissible (earnings $> Y_{\min}$) in year $t{-}1$ and in at least 2 additional years between $t{-}5$ and $t{-}2$.
+\end{enumerate}
+
+%===============================================================================
+\section{Parameters ($\approx 25$)}
+%===============================================================================
+
+\begin{table}[h]\centering
+\caption{Model parameters}
+\begin{tabular}{llcl}
+\toprule
+Block & Parameters & Count & Notes \\
+\midrule
+Type distribution & $\mu_\alpha,\; \sigma_\alpha$ & 2 & \\
+Early phase & $\psi_{\text{early}},\; \ell_0,\; \ell_\alpha$ & 3 & \\
+Firm distribution & Shape, scale of $F(p)$ & 2 & e.g., Pareto or discrete masses \\
+Compensating diff. & $c(M),\; c(H)$ & 2 & \\
+Labor market flows & $\lambda_0,\; \lambda_1,\; \delta_0,\; \delta_1$ & 4 & \\
+Birth-event probs. & $\pi^{\text{pd}}_0,\; \pi^{\text{pd}}_1,\; \pi^{\text{up}}_0,\; \pi^{\text{up}}_1$ & 4 & $\theta$ calibrated externally \\
+Human capital & $\psi_0,\; \psi_\alpha,\; \psi_{\text{age}},\; \psi_u$ & 4 & \\
+Amenity preferences & $v_0(H),\; v_1(H),\; g_{\text{mid}}$ & 3 & $v_0(M), v_1(M)$ as fractions of $H$ \\
+Fertility & $B_{\text{kid}}$ & 1 & $s(t)$ externally calibrated \\
+Other & $b,\; \text{scale}$ & 2 & \\
+\midrule
+\textbf{Total} & & \textbf{$\approx 25$} & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent\textbf{Externally calibrated:} $\theta$ (paid leave replacement rate, $\approx 0.6$--$0.8$), $s(t)$ (biological conception probability by age), $Y_{\min}$ (\$1,885 in 2010 dollars), $\beta$ (annual discount factor).
+
+%===============================================================================
+\section{Targeted Moments ($\approx 186$)}
+%===============================================================================
+
+\subsection{Block A: Lifecycle Earnings (GKOS SSA, $\sim$60 moments)}
+\begin{itemize}[nosep]
+  \item Mean log earnings $\times$ 6 LE groups $\times$ 7 ages \hfill (42)
+  \item Log earnings growth $\times$ 6 LE groups $\times$ 3 age windows \hfill (18)
+\end{itemize}
+
+\subsection{Block B: Birth-Event Dynamics (PSID, $\sim$50 moments)}
+\begin{itemize}[nosep]
+  \item Earnings path around 1st birth $\times$ 5 quintiles $\times$ 8 event-time periods \hfill (40)
+  \item E-to-U transition rate at birth $\times$ 5 quintiles \hfill (5)
+  \item Hourly wage change at birth $\times$ 5 quintiles \hfill (5)
+\end{itemize}
+
+\subsection{Block C: Hours and Amenity Sorting (PSID, $\sim$20 moments)}
+\begin{itemize}[nosep]
+  \item Mean annual hours $\times$ 3 LE groups $\times$ pre/post birth \hfill (6)
+  \item Share in high-amenity occupation $\times$ 3 LE groups $\times$ pre/post birth \hfill (6)
+  \item Hours by youngest child age bin $(0\text{--}2,\; 3\text{--}5,\; 6+)$ $\times$ 3 LE groups \hfill (9)
+\end{itemize}
+
+\subsection{Block D: Fertility and Initial Conditions (PSID, $\sim$20 moments)}
+\begin{itemize}[nosep]
+  \item Age at first birth $\times$ 5 LE quintiles \hfill (5)
+  \item Total children $\times$ 5 LE quintiles \hfill (5)
+  \item Fraction with children at 25 $\times$ education (college/non-college) \hfill (2)
+  \item Employment rate at 25 $\times$ education \hfill (2)
+  \item Mean earnings at 25 $\times$ education \hfill (2)
+  \item Earnings growth 25--35 among early mothers $\times$ education \hfill (2)
+\end{itemize}
+
+\subsection{Block E: Position-Dependent Recovery (PSID, $\sim$6 moments)}
+\begin{itemize}[nosep]
+  \item Earnings at $t{+}3$ and $t{+}5$ post-birth relative to pre-birth $\times$ 3 terciles \hfill (6)
+\end{itemize}
+
+\subsection{Block F: Cross-Sectional Earnings Dynamics (GKOS SSA, 36 moments)}
+
+From the \texttt{L1\_arc\_age\_re} sheet of the GKOS women's moments file:
+\begin{itemize}[nosep]
+  \item P10 of 1-year arc percent earnings change $\times$ 6 RE groups $\times$ 3 age groups \hfill (18)
+  \item Kelley skewness of 1-year arc percent earnings change $\times$ 6 RE groups $\times$ 3 age groups \hfill (18)
+\end{itemize}
+RE groups: bottom 10, 10--30, 30--50, 50--70, 70--90, top 10. \\
+Age groups: 25--34, 35--44, 45--54 (aggregating 5-year GKOS bins within each).
+
+\bigskip\noindent\textbf{Weighting.} Block-level weights ensure that the GKOS arc percent moments (Block~F, 36 moments, measured with high precision) receive total weight comparable to the PSID birth-event moments (Block~B, 50 moments, measured with substantial sampling noise), preventing the precise administrative moments from dominating the objective function.
+
+%===============================================================================
+\section{Counterfactual Experiments}
+%===============================================================================
+
+\begin{table}[h]\centering
+\caption{Counterfactual experiments}
+\begin{tabular}{lll}
+\toprule
+Label & Experiment & Channel isolated \\
+\midrule
+CF1 & No fertility ($\lambda_{\text{exo}} = 0$, \textsc{Try} disabled) & Total fertility contribution to LE inequality \\
+CF2 & Universal paid leave ($\pi_{\text{paid}}(p) = 1$ for all $p$) & Separation/reset channel \\
+CF3 & No amenity shift ($v_1 = 0$) & Amenity-sorting channel \\
+CF4 & No exogenous shocks ($\lambda_{\text{exo}} = 0$, endogenous active) & Unplanned pregnancy contribution \\
+CF5 & Halve amenity shift ($v_1 \to v_1/2$) & Policy: paternal leave / shared care \\
+CF6 & Fast amenity decay ($g_{\text{mid}} = 0$) & Policy: universal childcare at age 3 \\
+CF7 & No type heterogeneity ($\alpha = \bar\alpha$ for all) & Ex ante vs.\ fertility-driven inequality \\
+CF8 & Universal unpaid leave ($\pi_{\text{unpaid}} = 1$, $\pi_{\text{paid}} = 0$) & Job protection without wage replacement \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent\textbf{Decomposition:}
+\begin{itemize}[nosep]
+  \item Ex ante type heterogeneity: Baseline $-$ CF7
+  \item Total fertility channel: Baseline $-$ CF1
+    \begin{itemize}[nosep]
+      \item Separation sub-channel: CF1 $-$ CF2
+      \item Amenity-sorting sub-channel: CF1 $-$ CF3
+      \item Unplanned pregnancy sub-channel: Baseline $-$ CF4
+    \end{itemize}
+  \item Job protection vs.\ wage replacement: CF8 $-$ CF2
+\end{itemize}
+
+%===============================================================================
+\section{Key Design Choices}
+%===============================================================================
+
+\begin{table}[h]\centering\small
+\caption{Summary of design choices and justifications}
+\begin{tabular}{p{4.8cm}p{9cm}}
+\toprule
+Choice & Justification \\
+\midrule
+Amenity as worker choice & Realistic (within-job hours/flexibility adjustment); eliminates $a$ from state space; $F(p,a)$ reduces to $F(p)$; mirrors Morchio--Moser's endogenous amenity provision \\
+One-dimensional $p$ ladder & Acceptance rule $p' > p$ regardless of $k$ (amenity terms cancel); KOS backbone preserved \\
+Three-outcome birth event & Matches U.S.\ institutional structure: paid employer leave, unpaid FMLA, no protection. Generates continuous left tail in annual earnings changes via within-year timing draw \\
+Within-year timing draw & Bridges annual model to annual SSA data; generates continuous arc percent change distribution; computationally free (affects simulation only, not DP) \\
+No savings, risk-neutral & Standard in KOS/Burdett-Mortensen; $\LE = \Sigma w$ \\
+Annual periods & Matches PSID frequency and GKOS moment structure \\
+$k =$ age of youngest child & Dominant driver of amenity preferences; avoids full fertility history \\
+$\alpha$ one-dimensional, no $\phi$ & Fertility timing gradient from career costs $+ \lambda_{\text{exo}}(\alpha)$ \\
+Combined exo $+$ endo fertility & 45\% of U.S.\ births unintended; $\lambda_{\text{exo}}(\alpha)$ decreasing in $\alpha$ \\
+$\theta$ calibrated externally & Paid leave replacement rate identified from institutional data, not earnings dynamics \\
+$b$ calibrated to UI replacement & Unemployment flow value not identifiable from GKOS earnings moments (zero W-2 for non-employed); set to match $\approx 40$\% replacement rate \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\end{document}
