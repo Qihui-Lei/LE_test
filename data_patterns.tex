@@ -1,0 +1,223 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{caption}
+
+\newcommand{\LE}{\mathrm{LE}}
+\newcommand{\RE}{\mathrm{RE}}
+
+\title{\textbf{Motivating Data Patterns} \\ Female Lifetime Earnings Inequality}
+\author{}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\noindent This document summarizes key empirical patterns from the GKOS women's moments (SSA administrative data) that motivate and discipline the model in the accompanying specification. The data contain two tables: (i) cross-sectional moments of 1-year arc percent earnings changes by recent earnings (RE) group and age group (sheet \texttt{L1\_arc\_age\_re}), and (ii) mean earnings levels and growth rates by lifetime earnings (LE) percentile (sheet \texttt{incgrowth}). We organize the patterns separately for RE-based and LE-based moments.
+
+%===============================================================================
+\section{Recent Earnings (RE) Patterns}
+%===============================================================================
+
+The RE-based moments capture \emph{short-run earnings dynamics}---how annual earnings changes vary across the earnings distribution and over the lifecycle. RE groups are constructed from a 5-year trailing average of earnings, ranked within age group. The key statistic is the 1-year arc percent change, $\Delta^{\text{arc}} = 2(Y_{t+1} - Y_t)/(Y_{t+1} + Y_t)$, which is symmetric around zero and bounded by $[-2, 2]$.
+
+\subsection{Pattern RE-1: Large negative left tail, concentrated at low RE}
+
+\begin{table}[h]\centering
+\caption{P10 of 1-year arc percent earnings change}
+\begin{tabular}{lrrr}
+\toprule
+RE Group & Ages 25--34 & Ages 35--44 & Ages 45--54 \\
+\midrule
+Bottom 10 & $-1.59$ & $-1.42$ & $-1.42$ \\
+10--30    & $-1.16$ & $-0.97$ & $-0.90$ \\
+30--50    & $-0.87$ & $-0.64$ & $-0.56$ \\
+50--70    & $-0.69$ & $-0.46$ & $-0.39$ \\
+70--90    & $-0.60$ & $-0.37$ & $-0.31$ \\
+Top 10    & $-0.62$ & $-0.48$ & $-0.41$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent\textbf{Pattern.} The 10th percentile of earnings changes is deeply negative for low-RE women---a P10 of $-1.59$ means that 10\% of women in the bottom RE group experience near-total earnings collapse (arc percent change near $-2$ corresponds to going from positive to near-zero earnings). This left tail shrinks monotonically as RE rises, leveling off around the 70th--90th RE percentile.
+
+\medskip\noindent\textbf{Model connection.} The model generates this through two channels that disproportionately affect low-RE women:
+\begin{enumerate}[nosep]
+  \item \textbf{Birth-induced separation:} Low-RE women are at low-productivity firms where $\pi_{\text{paid}}(p)$ and $\pi_{\text{unpaid}}(p)$ are small, so births more often trigger full separation and near-zero earnings. The within-year timing draw $\tau$ generates a \emph{continuous} left tail rather than discrete mass points.
+  \item \textbf{Exogenous separation:} $\delta(p)$ is decreasing in $p$, so low-$p$ workers face higher baseline separation risk, amplifying the negative tail.
+\end{enumerate}
+
+\subsection{Pattern RE-2: Negative skewness everywhere, worsening with age at low RE}
+
+\begin{table}[h]\centering
+\caption{Kelley skewness of 1-year arc percent earnings change}
+\begin{tabular}{lrrr}
+\toprule
+RE Group & Ages 25--34 & Ages 35--44 & Ages 45--54 \\
+\midrule
+Bottom 10 & $-0.18$ & $-0.22$ & $-0.29$ \\
+10--30    & $-0.20$ & $-0.24$ & $-0.33$ \\
+30--50    & $-0.25$ & $-0.26$ & $-0.35$ \\
+50--70    & $-0.32$ & $-0.27$ & $-0.32$ \\
+70--90    & $-0.36$ & $-0.26$ & $-0.29$ \\
+Top 10    & $-0.35$ & $-0.26$ & $-0.29$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent\textbf{Pattern.} Earnings changes are negatively skewed for \emph{all} women---the distribution has a longer left tail than right tail. Two gradients emerge:
+\begin{itemize}[nosep]
+  \item \emph{Age gradient at low RE:} Skewness becomes more negative with age for the bottom half of the RE distribution (e.g., $-0.18 \to -0.22 \to -0.29$ for the bottom 10).
+  \item \emph{RE gradient at young ages:} Among young women (25--34), skewness is \emph{more} negative at the top of the distribution ($-0.36$ for RE 70--90) than the bottom ($-0.18$).
+\end{itemize}
+
+\medskip\noindent\textbf{Model connection.} The age gradient at low RE reflects the declining role of human capital growth as a positive shock: $\psi(\alpha, t)$ decreases with age, so the right tail of earnings changes shrinks, making the distribution more left-skewed. For young high-RE women, the strongly negative skewness reflects that they have ``more to lose''---they sit at high-$p$ firms with high $h$, but face the same birth-event risks. A birth-induced separation or amenity switch generates a large negative change relative to their high baseline. The job ladder (acceptance rule $p' > p$) limits upside moves for those already near the top.
+
+\subsection{Pattern RE-3: Dispersion declines with RE and age}
+
+\begin{table}[h]\centering
+\caption{P90--P10 spread of 1-year arc percent earnings change}
+\begin{tabular}{lrrr}
+\toprule
+RE Group & Ages 25--34 & Ages 35--44 & Ages 45--54 \\
+\midrule
+Bottom 10 & $2.74$ & $2.36$ & $2.20$ \\
+10--30    & $1.94$ & $1.57$ & $1.35$ \\
+30--50    & $1.38$ & $1.01$ & $0.83$ \\
+50--70    & $1.04$ & $0.70$ & $0.58$ \\
+70--90    & $0.87$ & $0.58$ & $0.46$ \\
+Top 10    & $0.91$ & $0.74$ & $0.62$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent\textbf{Pattern.} Earnings volatility is dramatically higher for low-RE women: the P90--P10 spread for the bottom 10 is roughly 3$\times$ that of the 70--90 group at every age. Both RE and age reduce dispersion, except that the top 10 shows slightly \emph{higher} dispersion than the 70--90 group (a ``U-shape'' at the top).
+
+\medskip\noindent\textbf{Model connection.}
+\begin{itemize}[nosep]
+  \item \emph{RE gradient:} Low-RE women are at low-$p$ firms with high $\delta(p)$, high birth-separation risk, and the greatest scope for upward job-ladder moves ($p' > p$ is easily satisfied). This generates both large drops and large gains.
+  \item \emph{Age gradient:} Human capital growth $\psi(\alpha, t)$ declines with age, reducing upside potential. Workers are further up the job ladder, reducing both separation risk (lower $\delta(p)$) and upward mobility (fewer firms above $p$).
+  \item \emph{Top-10 uptick:} Partially reflects that the top RE group includes women with high $\alpha$ who may have birth events generate large percentage changes even at high earnings levels.
+\end{itemize}
+
+\subsection{Pattern RE-4: Young women face the most volatile earnings}
+
+Across every RE group, the youngest age group (25--34) exhibits the highest P90--P10 spread and the deepest P10 values. For example, the P90--P10 spread for the 30--50 RE group drops from 1.38 at ages 25--34 to 0.83 at ages 45--54---a 40\% reduction.
+
+\medskip\noindent\textbf{Model connection.} Ages 25--34 are the prime fertility years. The model predicts concentrated earnings disruptions in this window through birth events (both exogenous shocks and endogenous fertility choices), combined with still-rapid human capital accumulation that generates large upside moves. The three-outcome birth structure (paid leave, unpaid leave, separation) with within-year timing produces a wide range of outcomes for young workers that compresses as fertility tapers off after age 40.
+
+%===============================================================================
+\section{Lifetime Earnings (LE) Patterns}
+%===============================================================================
+
+The LE-based moments capture \emph{long-run earnings trajectories}---how the level and growth of earnings vary across the lifetime earnings distribution. LE is defined as $\sum_{t=25}^{55} w_t$ and women are ranked into percentiles by this cumulative measure.
+
+\subsection{Pattern LE-1: Massive fan-out of earnings over the lifecycle}
+
+\begin{table}[h]\centering
+\caption{Mean earnings (\$2010) by LE group and age}
+\begin{tabular}{lrrrr}
+\toprule
+LE Group & Age 25 & Age 35 & Age 45 & Age 55 \\
+\midrule
+Bottom 10 & \$5,683  & \$4,564  & \$6,912   & \$5,807 \\
+10--30    & \$9,060  & \$8,968  & \$13,366  & \$13,496 \\
+30--50    & \$12,248 & \$15,264 & \$22,006  & \$23,176 \\
+50--70    & \$15,834 & \$23,112 & \$33,039  & \$34,911 \\
+70--90    & \$20,300 & \$34,690 & \$50,468  & \$54,513 \\
+Top 10    & \$26,176 & \$59,632 & \$102,964 & \$116,391 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent\textbf{Pattern.} The top-10/bottom-10 earnings ratio expands from 4.6$\times$ at age 25 to 20.0$\times$ at age 55---a 4.4-fold expansion of inequality over the working life. This fan-out is the central fact the model must explain for women.
+
+\medskip\noindent\textbf{Model connection.} Three forces drive the fan-out:
+\begin{enumerate}[nosep]
+  \item \textbf{Job ladder:} High-$\alpha$ women accumulate human capital faster ($\psi_\alpha > 0$) and climb to higher-$p$ firms. Since wages are $w = p \cdot h - c(a)$, the multiplicative structure amplifies initial differences.
+  \item \textbf{Differential fertility costs:} Low-LE women are more likely to experience birth-induced separations (low $\pi_{\text{paid}}$, low $\pi_{\text{unpaid}}$), which destroy firm matches and depreciate $h$. High-LE women at high-$p$ firms retain their jobs through paid leave.
+  \item \textbf{Amenity sorting:} Low-LE women who become mothers at low-$p$ firms see the amenity cost $c(H)$ take a larger bite of their already-low wages, compounding the earnings gap.
+\end{enumerate}
+
+\subsection{Pattern LE-2: Earnings \emph{decline} for the bottom of the LE distribution}
+
+\begin{table}[h]\centering
+\caption{Log earnings growth by LE group and age window}
+\begin{tabular}{lrrr}
+\toprule
+LE Group & Growth 25--35 & Growth 35--45 & Growth 45--55 \\
+\midrule
+Bottom 10 & $-0.23$ & $0.42$ & $-0.19$ \\
+10--30    & $-0.02$ & $0.40$ & $0.00$ \\
+30--50    & $0.21$  & $0.37$ & $0.05$ \\
+50--70    & $0.37$  & $0.36$ & $0.06$ \\
+70--90    & $0.53$  & $0.37$ & $0.08$ \\
+Top 10    & $0.79$  & $0.49$ & $0.12$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent\textbf{Pattern.} The bottom-10 LE group experiences \emph{negative} earnings growth from 25 to 35 ($-0.23$) and again from 45 to 55 ($-0.19$). This is striking: the decade when most women experience peak wage growth is a period of earnings \emph{decline} for the lowest-LE women. All groups share a mid-career hump (positive growth 35--45), but growth is monotonically increasing in LE at every age window.
+
+\medskip\noindent\textbf{Model connection.}
+\begin{itemize}[nosep]
+  \item \emph{Decline at 25--35 for low LE:} This is the prime fertility window. Low-$\alpha$ women face high exogenous birth probability $\lambda_{\text{exo}}(\alpha)$ (decreasing in $\alpha$), combined with low-$p$ firms that offer neither paid nor unpaid leave. Birth events trigger separation, $h$ depreciation, and a reset to unemployment. Pre-25 births (from the early phase) compound the problem by giving these women lower $h_{25}$ and existing childcare needs.
+  \item \emph{Recovery at 35--45:} The universal positive growth in this window reflects that most women have completed their fertility. The job ladder resumes its role: re-employed women climb from low $p$ back up. As children age ($k$ moves from 0--2 to 3--5 to 6+), amenity preferences shift back ($g(k) \to 0$), and women switch to $a = L$, recovering the wage cut $c(a)$.
+  \item \emph{Late-career decline for low LE:} $\psi(\alpha, t)$ declines with age. For low-$\alpha$ women, human capital growth turns negligible or negative, while exogenous separation $\delta(p)$ at low-$p$ firms continues. This produces the ``last-decade fade'' in the bottom of the distribution.
+\end{itemize}
+
+\subsection{Pattern LE-3: Extreme earnings growth at the top}
+
+The top-10 LE group experiences cumulative log earnings growth of 1.40 from age 25 to 55---a roughly 4-fold increase in earnings. Growth from 25 to 35 alone is 0.79, nearly four times the growth of the 10--30 group ($-0.02$) over the same window.
+
+\medskip\noindent\textbf{Model connection.} High-$\alpha$ women benefit from the full compound effect of the job ladder:
+\begin{itemize}[nosep]
+  \item Rapid human capital accumulation ($\psi_\alpha \cdot \alpha$ large).
+  \item Steady job-ladder climbing with low separation risk ($\delta(p)$ small at high $p$).
+  \item When births occur, paid leave ($\pi_{\text{paid}}(p)$ high) preserves the firm match and $h$. The earnings dip is small and temporary.
+  \item Amenity costs are affordable: $c(H)$ is a small fraction of $p \cdot h$ for high-$p$, high-$h$ women.
+\end{itemize}
+
+\subsection{Pattern LE-4: The 35--45 ``catch-up'' is universal but insufficient}
+
+All six LE groups show positive growth in the 35--45 window, with remarkably similar rates (0.37--0.49). This uniformity contrasts sharply with the wide dispersion in the 25--35 window ($-0.23$ to $0.79$).
+
+\medskip\noindent\textbf{Model connection.} By 35--45, most women have exited the fertile window (fertility declines steeply after 40). The ``catch-up'' growth at the bottom reflects:
+\begin{itemize}[nosep]
+  \item Re-entry to employment after birth-induced unemployment spells.
+  \item Resumption of job-ladder climbing ($p' > p$ acceptance).
+  \item Unwinding of amenity sorting as $g(k) \to 0$.
+\end{itemize}
+However, the catch-up is \emph{insufficient} to close the gap opened during 25--35, because: (i) $h$ was depreciated during unemployment, creating a permanent level shift; (ii) firm match quality was reset to a lower $p$, requiring years to rebuild; (iii) the job ladder is a slow process---only $\lambda_1$ fraction of workers receive offers each period.
+
+\subsection{Pattern LE-5: Late-career deceleration is steeper at the bottom}
+
+Growth from 45 to 55 is near zero or negative for the bottom half of the LE distribution, while the top decile still grows at 0.12. The bottom-10 group's $-0.19$ late-career decline means these women end their career earning \emph{less} than at age 45.
+
+\medskip\noindent\textbf{Model connection.} The interaction of declining $\psi(\alpha, t)$ with the job ladder explains this: low-$\alpha$ women at low-$p$ firms still face meaningful separation risk ($\delta(p)$ high), but now have little human capital growth to compensate. High-$\alpha$ women at high-$p$ firms have negligible separation risk and still accumulate some $h$, maintaining modest positive growth even late in career.
+
+%===============================================================================
+\section{Cross-Cutting Patterns}
+%===============================================================================
+
+\subsection{Pattern X-1: Fertility as the key driver of divergence}
+
+The sharpest divergence across LE groups occurs precisely during the fertility window (ages 25--35). The RE data confirm this: the youngest age group shows the highest dispersion and deepest left tail. Together, these patterns suggest that \emph{how women interact with the labor market around childbirth} is the primary source of lifetime earnings inequality---not initial differences in ability, which are modest at age 25 (4.6$\times$ top/bottom ratio).
+
+\subsection{Pattern X-2: Institutional gradient in downside risk}
+
+Across both RE and LE tables, the gradient in downside risk maps naturally onto the model's three-outcome birth structure:
+\begin{itemize}[nosep]
+  \item \textbf{High-RE/LE women} $\to$ high-$p$ firms $\to$ paid leave likely $\to$ job preserved, partial wage replacement $\to$ small earnings dip.
+  \item \textbf{Mid-RE/LE women} $\to$ mid-$p$ firms $\to$ unpaid leave possible $\to$ job preserved but zero income during leave $\to$ moderate dip.
+  \item \textbf{Low-RE/LE women} $\to$ low-$p$ firms $\to$ separation likely $\to$ loss of firm match, $h$ depreciation $\to$ near-total earnings collapse.
+\end{itemize}
+This maps directly to the institutional structure: paid employer leave at large firms, FMLA-eligible unpaid leave at medium firms, and no protection at small firms.
+
+\subsection{Pattern X-3: Partial but incomplete recovery}
+
+Both the RE and LE data show that negative shocks are partially---but not fully---reversed. The LE data show a universal mid-career rebound (Pattern LE-4), while the RE data show that P10 values are less extreme at older ages (Pattern RE-1). However, the LE fan-out (Pattern LE-1) demonstrates that the gap opened during the fertility years persists. The model accounts for this through the permanent destruction of firm match quality upon separation: even after re-employment, a woman starts at a lower $p$ and must re-climb the ladder, a process that takes years and may never reach the counterfactual path.
+
+\end{document}
