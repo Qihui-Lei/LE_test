@@ -199,6 +199,59 @@ Growth from 45 to 55 is near zero or negative for the bottom half of the LE dist
 \medskip\noindent\textbf{Model connection.} The interaction of declining $\psi(\alpha, t)$ with the job ladder explains this: low-$\alpha$ women at low-$p$ firms still face meaningful separation risk ($\delta(p)$ high), but now have little human capital growth to compensate. High-$\alpha$ women at high-$p$ firms have negligible separation risk and still accumulate some $h$, maintaining modest positive growth even late in career.
 
 %===============================================================================
+\section{Gender Comparison: Women vs.\ Men}
+%===============================================================================
+
+To sharpen the case that fertility-driven job-ladder resetting---rather than general labor-market differences---is the key mechanism behind female lifetime earnings inequality, we compare the GKOS women's moments with the analogous moments for men. Because men face no childbirth disruptions in the data, the male pattern serves as a ``fertility-free'' counterfactual against which the female-specific distortions become legible. Five discrepancies emerge that are directly informative about model parameters.
+
+\subsection{Discrepancy G-1: Women's left tail is deeper at high RE in the fertility window}
+
+Among young workers (ages 25--34), the P10 of arc percent earnings changes is \emph{more negative for women than for men} in the upper half of the RE distribution (difference of $-0.15$ to $-0.18$ at RE groups 50--70 and 70--90), while it is slightly \emph{less negative} for women at the very bottom (difference of $+0.04$ at RE bottom 10). By ages 35--44, this pattern reverses: women in the bottom RE groups now have substantially \emph{less negative} P10 than men (difference of $+0.30$), while the mid-RE gap shrinks.
+
+\medskip\noindent\textbf{Model connection.} Young, high-RE women are at high-$p$ firms where births are most likely to generate paid or unpaid leave---but even with job protection, the within-year timing draw $\tau$ and the amenity switch from $a=L$ to $a=H$ produce large negative arc percent changes. Men at the same firms face no such disruption, so their P10 is more moderate. The post-35 reversal reflects that women in the bottom RE group are re-entering the job ladder after fertility disruptions, generating upward earnings moves, while men at the bottom increasingly face late-career structural decline. This asymmetry directly identifies $\pi_{\text{paid}}(p)$, $\pi_{\text{unpaid}}(p)$, and $c(H)$: the fertility costs are largest for women who have the most to lose.
+
+\subsection{Discrepancy G-2: Women are more negatively skewed than men at all RE groups, especially high-RE young workers}
+
+The Kelley skewness of earnings changes is negative for both genders, but women are systematically \emph{more negatively skewed} than men across every RE group and age group (all differences negative). The gap is largest for young, high-RE women: at ages 25--34, the top-10 RE group shows a skewness gap of $-0.21$ (women $-0.35$ vs.\ men $-0.14$). By ages 45--54 the gap narrows to $-0.10$ and is more uniform across the RE distribution.
+
+\medskip\noindent\textbf{Model connection.} Negative skewness in the model arises from the asymmetric structure of birth events: a birth can cause a large discrete drop (separation, leave) but there is no symmetric large positive event of comparable magnitude. This asymmetry is entirely absent for men. The concentration of the skewness gap among high-RE young women confirms that birth events---which are more consequential at high earnings levels---are the primary driver. The amenity-sorting channel ($v_1(H) > 0$, $c(H) > 0$) generates an additional downward push as mothers switch amenity levels. The convergence of skewness gaps by age 45--54 is consistent with the model's fertility window closing at age 40.
+
+\subsection{Discrepancy G-3: Women's bottom LE declines more in 25--35 but recovers faster in 35--45}
+
+The most striking gender comparison is in earnings growth by LE group and age window:
+\begin{itemize}[nosep]
+  \item \textbf{Ages 25--35:} Bottom-10 women grow $-0.23$ log points vs.\ $-0.11$ for men---a gap of $-0.12$ log points. Top-10 women grow $0.79$ vs.\ $1.17$ for men---a gap of $-0.38$ log points. Women underperform men at \emph{every} LE group in the 25--35 window.
+  \item \textbf{Ages 35--45:} The pattern reverses. Bottom-10 women grow $+0.42$ log points vs.\ $+0.01$ for men. Mid-group women also recover faster. Women \emph{outperform} men at every LE group except the top.
+  \item \textbf{Ages 45--55:} Men's bottom LE collapses dramatically ($-0.39$ log points for men vs.\ $-0.19$ for women), suggesting a different late-career mechanism for men (likely disability and involuntary job loss), outside the scope of the fertility model.
+\end{itemize}
+
+\medskip\noindent\textbf{Model connection.} The 25--35 gap is the clearest fingerprint of the fertility channel: birth events, exogenous birth shocks $\lambda_{\text{exo}}(\alpha)$ (higher for low-$\alpha$ women), and firm-type-dependent leave outcomes ($\pi_{\text{paid}}$, $\pi_{\text{unpaid}}$) all generate larger earnings losses for women. The rapid 35--45 recovery---women recovering \emph{faster} than men---is explained by the job-ladder mechanism re-engaging: once the fertility window closes ($k \to 6+$, $g(k) \to 0$), women drop their amenity premium ($a \to L$), human capital accumulation resumes, and re-employed women climb back up the $p$-ladder. Men who fall to the bottom of the LE distribution appear to face a different structural trap with no comparable recovery, motivating a female-focused model. The differential recovery also pins down the human capital depreciation parameter $\psi_u$ and the job-offer rate $\lambda_0$: they must be calibrated so that birth-displaced women return to the ladder within 10 years.
+
+\subsection{Discrepancy G-4: Women's inequality is front-loaded; men's is back-loaded}
+
+The top-10/bottom-10 earnings ratio evolves very differently by gender:
+\begin{center}
+\begin{tabular}{lrrrrrrrr}
+\toprule
+Gender & Age 25 & Age 30 & Age 35 & Age 40 & Age 45 & Age 50 & Age 55 \\
+\midrule
+Women & 4.6 & 9.6 & 13.1 & 14.4 & 14.9 & 17.0 & 20.0 \\
+Men   & 3.4 & 7.6 & 12.6 & 19.4 & 25.5 & 32.1 & 41.2 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Women start with \emph{higher} initial inequality (4.6$\times$ vs.\ 3.4$\times$ at age 25) but end with \emph{lower} inequality at age 55 (20.0$\times$ vs.\ 41.2$\times$). The female arc is front-loaded: most inequality expansion occurs in 25--35 and plateaus thereafter. The male arc is back-loaded: inequality keeps compounding throughout the career.
+
+\medskip\noindent\textbf{Model connection.} The front-loaded female arc reflects that fertility disruptions strike early and hard, creating a large gap in the 25--35 window, but the job-ladder re-engagement partially compresses the distribution afterward. The multiplicative wage structure ($w = p \cdot h$) means that for men, without a fertility-induced interruption, high-$\alpha$ men simply keep climbing relative to low-$\alpha$ men throughout the career---generating back-loaded divergence. For women, the early-25 initial inequality already reflects heterogeneity in pre-25 fertility (early phase: women with early births enter at lower $h_{25}$), consistent with $\lambda_{\text{exo}}(\alpha)$ operating before the main phase. The compression of female inequality after 35 is direct evidence for the recovery channels in the model (job-ladder re-entry, amenity unwinding, childcare aging $g(k)\to 0$).
+
+\subsection{Discrepancy G-5: Men's top earnings diverge far more over the career}
+
+At age 35, top-10 men and women earn comparably (\$111k vs.\ \$60k---already a gap, but men's top earners accelerate further to \$254k by age 55 vs.\ \$116k for women). The top-10 LE growth for men from 25 to 55 is 2.56 log points (roughly a 13-fold increase) versus 1.40 for women (4-fold). The male top diverges continuously; the female top shows a partial plateau after 45.
+
+\medskip\noindent\textbf{Model connection.} This discrepancy is consistent with the model's amenity-sorting mechanism even for high-LE women. High-$\alpha$ women at high-$p$ firms who have births switch to $a=H$, permanently paying $c(H)$ per period while their children are young. Even when $g(k)$ eventually reaches $g_{\text{low}} \approx 0$, some women may have a second birth, re-activating the preference shift. This cumulative amenity cost, compounded over several children and multiple fertility episodes, depresses the female earnings ceiling relative to men who face no such trade-off. Formally, the difference between the male and female top-10 earnings trajectory identifies the combined effect of $c(H)$, the number of births for high-$\alpha$ women, and $\theta$ (the leave replacement rate).
+
+%===============================================================================
 \section{Cross-Cutting Patterns}
 %===============================================================================
 
