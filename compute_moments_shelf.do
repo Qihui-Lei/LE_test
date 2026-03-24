@@ -73,9 +73,9 @@ label var age "Age (survey year - birth year)"
 *--- Real earnings in 2024 USD (tax year = survey year - 1 for biennial) ---
 * EARN_TOT_RD is already inflation-adjusted
 * Note: earnings refer to the prior tax year
-gen earn_real = EARN_TOT_RD
+gen earn_real = EARN_TOT_RD/143.78 * 100
 replace earn_real = 0 if earn_real == . | earn_real < 0
-label var earn_real "Individual real labor earnings (2024 USD)"
+label var earn_real "Individual real labor earnings (2010 USD)"
 
 *--- Positive earnings indicator ---
 gen has_earn = (earn_real > 0 & earn_real < .)
